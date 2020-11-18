@@ -7,7 +7,7 @@
 #define BUTTON_UP 4
 #define BUTTON_DOWN 0
 #define BUTTON_DB_DELAY 150
-#define OUTPUT_ON_TIME 150
+#define OUTPUT_ON_TIME 300
 
 TM1637 Display(CLK,DIO);
 
@@ -26,12 +26,13 @@ unsigned long output2_pressed_timer = 0;
 void setup() {
   Display.init();
   Display.set(BRIGHT_TYPICAL);
+  Display.point(1);
 
   pinMode(OUTPUT1, OUTPUT);
   pinMode(OUTPUT2, OUTPUT);
   pinMode(BUTTON_UP, INPUT);
   pinMode(BUTTON_DOWN, INPUT);
-  delay(500);
+  delay(200);
   interval = EEPROM.read(addr);
   digitalWrite(OUTPUT1, LOW);
   digitalWrite(OUTPUT2, LOW);
@@ -42,7 +43,6 @@ void loop() {
   get_button_up_press();
   update_screen();
   handle_outputs();
-  handle_turning_off_outputs();
 }
 
 void handle_outputs() {
@@ -59,6 +59,7 @@ void handle_outputs() {
     output_toggle = !output_toggle;
   }
   loop_time = next_time;
+  handle_turning_off_outputs();
 }
 
 void handle_turning_off_outputs() {
@@ -71,28 +72,36 @@ void handle_turning_off_outputs() {
 }
 
 void update_screen() {
-  int tens_digit = interval/10;
-  int singles_digit = interval - (tens_digit*10);
-  Display.display(2, tens_digit);
-  Display.display(3, singles_digit);
+  int minutes = interval/60;
+  int tens = (interval-minutes*60)/10;
+  int singles = interval - (minutes*60) - (tens*10);
+  Display.display(2, tens);
+  Display.display(3, singles);
+  Display.display(1, minutes);
 }
 
 void get_button_up_press() {
-  if (!digitalRead(BUTTON_UP) && button_up_last_pressed < millis() - BUTTON_DB_DELAY) {
-    button_up_last_pressed = millis();
-    if (interval < 60) {
-      interval++;
-      EEPROM.write(addr, interval);
+  if (!digitalRead(BUTTON_UP)) {
+    if (button_up_last_pressed < millis() - BUTTON_DB_DELAY) {
+      button_up_last_pressed = millis();
+      if (interval < 120) {
+        interval++;
+        EEPROM.write(addr, interval);
+      } 
     }
+    loop_time = 0;
   }
 }
 
 void get_button_down_press() {
-  if (!digitalRead(BUTTON_DOWN) && button_down_last_pressed < millis() - BUTTON_DB_DELAY) {
-    button_down_last_pressed = millis();
-    if (interval > 0) {
-      interval--;
-      EEPROM.write(addr, interval);
+  if (!digitalRead(BUTTON_DOWN)) {
+    if (button_down_last_pressed < millis() - BUTTON_DB_DELAY) {
+      button_down_last_pressed = millis();
+      if (interval > 1) {
+        interval--;
+        EEPROM.write(addr, interval);
+      } 
     }
+    loop_time = 0;
   }
 }

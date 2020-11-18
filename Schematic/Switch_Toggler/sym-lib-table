@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name Switch_Toggler-rescue)(type Legacy)(uri ${KIPRJMOD}/Switch_Toggler-rescue.lib)(options "")(descr ""))
+)

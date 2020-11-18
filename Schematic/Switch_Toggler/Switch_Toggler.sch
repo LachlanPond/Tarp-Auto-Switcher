@@ -109,7 +109,7 @@ $EndComp
 Wire Wire Line
 	9300 2950 9300 2800
 $Comp
-L my_library:TM1637 U3
+L Switch_Toggler-rescue:TM1637-my_library U3
 U 1 1 5F57E922
 P 4500 1500
 F 0 "U3" H 5078 1551 50  0000 L CNN
