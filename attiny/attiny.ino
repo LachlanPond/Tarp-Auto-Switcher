@@ -12,7 +12,7 @@
 TM1637 Display(CLK,DIO);
 
 unsigned long time;
-int interval;
+unsigned long interval;
 int addr = 1;
 bool button_up_flag = false;
 bool button_down_flag = false;
